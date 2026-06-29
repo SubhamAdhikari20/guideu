@@ -1,0 +1,28 @@
+name: ci-realtime-engine
+
+on:
+  push:
+    branches: [main, "sprint-*"]
+    paths: ["services/real-time-engine/**", ".github/workflows/ci-realtime-engine.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["services/real-time-engine/**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/real-time-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: services/real-time-engine/package-lock.json
+      - run: npm ci
+      - name: Type-check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint

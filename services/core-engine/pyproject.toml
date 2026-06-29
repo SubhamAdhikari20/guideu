@@ -1,9 +1,35 @@
 [project]
 name = "core-engine"
 version = "0.1.0"
-description = "Add your description here"
+description = "GuideU core relational engine — Django/DRF business backend (auth, catalog, bookings, payments, permits, reviews, notifications, analytics)."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "django>=6.0.6",
+    "django-cors-headers>=4.9.0",
+    "django-filter>=25.2",
+    "djangorestframework>=3.17.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.28.0",
+    "celery>=5.4.0",
+    "redis>=8.0.0",
+    "requests>=2.32.0",
+    "gunicorn>=22.0.0",
+    "python-dotenv>=1.0.1",
+    "pillow>=12.2.0",
+    "psycopg[binary]>=3.3.4",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-django>=4.12.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-ra"
+
+[tool.uv]
+package = false

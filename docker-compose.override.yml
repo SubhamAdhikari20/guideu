@@ -1,0 +1,23 @@
+# =============================================================================
+# GuideU — local development overrides (auto-merged by `docker compose up`).
+# -----------------------------------------------------------------------------
+# Python deps are installed system-wide in the images (uv pip install --system),
+# so bind-mounting the source tree over /app is safe and gives hot reload.
+# The Node real-time-engine is best run on the host in watch mode (`make realtime`)
+# since its runtime image is a production build; it is left on its built command.
+# =============================================================================
+
+services:
+  core-engine:
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DJANGO_DEBUG: "True"
+    volumes:
+      - ./services/core-engine:/app
+
+  analytics-engine:
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+    volumes:
+      - ./services/analytics-engine:/app
