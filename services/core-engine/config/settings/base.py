@@ -54,13 +54,20 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
-# Sprint 1 (foundation) ships only the shared `common` utilities and the
-# `authentication` identity layer. Domain apps (catalog, bookings, payments,
-# reviews, notifications, analytics, trust, gamification, audit, permits) are
-# delivered from sprint-2 onward and registered here as they land.
 LOCAL_APPS = [
     "src.common",
     "src.authentication",
+    "src.catalog",
+    "src.bookings",
+    "src.permits",
+    "src.payments",
+    "src.reviews",
+    "src.favorites",
+    "src.notifications",
+    "src.analytics",
+    "src.trust",
+    "src.gamification",
+    "src.audit",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -74,6 +81,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "src.audit.middleware.RequestAuditMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -175,8 +183,8 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "GuideU Core Engine API",
-    "DESCRIPTION": "Business backend for GuideU — foundation (accounts/auth). "
-    "Domain APIs (catalog, bookings, payments, trust/anti-scam …) land in later sprints.",
+    "DESCRIPTION": "Business backend for GuideU — accounts, catalog, bookings, "
+    "payments, permits, reviews, notifications, trust/anti-scam.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
@@ -202,8 +210,12 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
-# Periodic schedules are contributed by the apps that own them (later sprints).
-CELERY_BEAT_SCHEDULE: dict[str, dict] = {}
+CELERY_BEAT_SCHEDULE = {
+    "expire-stale-pending-bookings": {
+        "task": "src.bookings.tasks.expire_stale_pending_bookings",
+        "schedule": 60 * 60,  # hourly
+    },
+}
 
 # ---- External services -----------------------------------------------------
 ANALYTICS_ENGINE_URL = os.environ.get("ANALYTICS_ENGINE_URL", "http://localhost:8001")
