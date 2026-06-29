@@ -1,22 +1,34 @@
-"""
-URL configuration for config project.
+"""Root URL configuration.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+All REST endpoints are versioned under ``/api/<version>/`` (URLPathVersioning,
+``v1`` only for now). OpenAPI schema + Swagger UI are served via drf-spectacular.
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+from . import views
+
+# Versioned API surface. The leading ``api/<version>/`` prefix supplies the
+# ``version`` kwarg that DRF's URLPathVersioning reads.
+# Sprint 1 exposes only the authentication surface. Domain routers
+# (catalog, bookings, payments, reviews, …) are mounted here in later sprints.
+api_patterns = [
+    path("auth/", include("src.authentication.urls")),
+]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("", views.service_index, name="service-index"),
+    path("healthz/", views.healthz, name="healthz"),
+    path("admin/", admin.site.urls),
+    # OpenAPI
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    # Versioned REST API
+    path("api/<version>/", include(api_patterns)),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
