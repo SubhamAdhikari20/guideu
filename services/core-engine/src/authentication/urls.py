@@ -8,8 +8,8 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
-    path('auth/token/', EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/register/', RegistrationAPIView.as_view(), name='register'),
+    path('token/', EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('register/', RegistrationAPIView.as_view(), name='register'),
     path('', include(router.urls)),
 ]
