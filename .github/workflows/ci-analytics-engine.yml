@@ -1,0 +1,25 @@
+name: ci-analytics-engine
+
+on:
+  push:
+    branches: [main, "sprint-*"]
+    paths: ["services/analytics-engine/**", ".github/workflows/ci-analytics-engine.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["services/analytics-engine/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/analytics-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync
+      - name: Run tests
+        run: uv run pytest -q

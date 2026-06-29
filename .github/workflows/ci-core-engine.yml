@@ -1,0 +1,27 @@
+name: ci-core-engine
+
+on:
+  push:
+    branches: [main, "sprint-*"]
+    paths: ["services/core-engine/**", ".github/workflows/ci-core-engine.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["services/core-engine/**"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/core-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync
+      - name: Django system check
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.dev
+        run: uv run python manage.py check
