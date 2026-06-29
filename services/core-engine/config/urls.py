@@ -13,10 +13,18 @@ from . import views
 
 # Versioned API surface. The leading ``api/<version>/`` prefix supplies the
 # ``version`` kwarg that DRF's URLPathVersioning reads.
-# Sprint 1 exposes only the authentication surface. Domain routers
-# (catalog, bookings, payments, reviews, …) are mounted here in later sprints.
 api_patterns = [
     path("auth/", include("src.authentication.urls")),
+    path("catalog/", include("src.catalog.urls")),
+    path("bookings/", include("src.bookings.urls")),
+    path("permits/", include("src.permits.urls")),
+    path("payments/", include("src.payments.urls")),
+    path("reviews/", include("src.reviews.urls")),
+    path("favorites/", include("src.favorites.urls")),
+    path("notifications/", include("src.notifications.urls")),
+    path("analytics/", include("src.analytics.urls")),
+    path("trust/", include("src.trust.urls")),
+    path("gamification/", include("src.gamification.urls")),
 ]
 
 urlpatterns = [
