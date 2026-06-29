@@ -18,4 +18,9 @@ class ApiEndpoints {
   static const String refresh = '/auth/token/refresh/';
   static const String register = '/auth/register/';
   static const String me = '/auth/users/me/';
+
+  // Catalog (core-engine)
+  static const String routes = '/catalog/routes/';
+  static const String regions = '/catalog/regions/';
+  static const String guidesRegistry = '/catalog/guides-registry/';
 }
