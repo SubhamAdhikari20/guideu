@@ -4,7 +4,7 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
-import '../../features/home/presentation/pages/home_placeholder_page.dart';
+import '../../features/home/presentation/pages/main_shell_page.dart';
 
 /// Named routes for GuideU.
 class AppRoutes {
@@ -27,6 +27,6 @@ final appRouter = GoRouter(
       path: AppRoutes.forgotPassword,
       builder: (context, state) => const ForgotPasswordPage(),
     ),
-    GoRoute(path: AppRoutes.home, builder: (context, state) => const HomePlaceholderPage()),
+    GoRoute(path: AppRoutes.home, builder: (context, state) => const MainShellPage()),
   ],
 );
