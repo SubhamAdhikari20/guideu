@@ -16,6 +16,6 @@ class ApiEndpoints {
   // Auth (core-engine)
   static const String login = '/auth/token/';
   static const String refresh = '/auth/token/refresh/';
-  static const String register = '/auth/users/';
+  static const String register = '/auth/register/';
   static const String me = '/auth/users/me/';
 }
