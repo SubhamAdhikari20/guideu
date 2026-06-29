@@ -64,3 +64,29 @@ real tourist-price discrimination. The scam classifier must flag overcharging
 launder discrimination into the model). We exclude protected attributes from the
 feature set and run a post-hoc fairness audit (flag-rate parity across
 continents). See [ethics-and-fairness.md](ethics-and-fairness.md).
+
+## ADR-0008 — Sprint-1 re-scoped to foundation; features deferred (preserved)
+**Date:** 2026-06-29 · **Status:** Accepted
+
+The delivery brief defines sprint-1 as repository **foundation only**. The repo
+already contained a built-ahead domain/ML/realtime implementation (uncommitted).
+We re-scope sprint-1 to foundation (config, `common`, `authentication`, service
+skeletons, infra, CI, docs) and **preserve** all feature code on
+`backup/pre-sprint1-2026-06-29`, relocating it to `sprint-2`. Nothing is deleted.
+
+## ADR-0009 — Dockerfiles colocated with each service
+**Date:** 2026-06-29 · **Status:** Accepted
+
+The brief suggested a central `infra/docker/`. We keep each `Dockerfile` next to
+its service (`services/<svc>/Dockerfile`) so build contexts are self-contained and
+images build independently; `docker-compose.yml` references them via per-service
+`build.context`. `infra/` holds orchestration-level assets (nginx) only.
+
+## ADR-0010 — Frontends follow the leelame clean architecture
+**Date:** 2026-06-29 · **Status:** Accepted
+
+`apps/mobile_app` and `apps/web_admin` adopt the layering proven in the team's
+`leelame` reference: Flutter `app/` + `core/` + feature-first
+`features/<f>/{data,domain,presentation}` (MVVM + Riverpod); Next.js `app/` +
+`components/` + `lib/{api,actions}` + `schemas/` + `types/` + `hooks/`. This keeps
+GuideU consistent with patterns the team already maintains.

@@ -1,223 +1,116 @@
-# GuideU: Smart Travel Companion
+# GuideU — All-in-One AI Tourism Platform for Nepal
 
-GuideU is an enterprise-grade, polyglot microservices platform designed to revolutionize tourism and trekking safety in Nepal. Built to scale under high concurrent loads, the system automates structured trekking permit management (TIMS, National Park clearances), secure tour guide matching, escrowed payment lifecycles, real-time telemetry location tracking, and intelligent machine learning travel recommendations.
+> Verified guides, fair pricing, anti-scam intelligence and end-to-end trip
+> planning — delivered as a production-grade, polyglot microservices monorepo.
 
-This repository acts as a unified monorepo housing decoupled microservices optimized with modern environment orchestrators (`uv` for Python and `npm` for Node.js).
+GuideU helps tourists in Nepal book **verified guides**, plan trips, and avoid
+**scams/over-pricing**, while giving vendors reach and authorities trustworthy
+oversight. It is both a final-year thesis project and an intended startup, built
+to professional engineering standards.
 
 ---
 
-## 🏛️ Distributed System Architecture
+## 🏛️ Architecture
 
-To balance complex transaction lifecycles against extreme asynchronous and heavy algorithmic computing demands, GuideU utilizes a distributed, fault-isolated **Polyglot Microservices Architecture**.
+A polyglot, fault-isolated microservices architecture behind an nginx gateway.
 
 ```text
-                               ┌────────────────────────┐
-                               │   Flutter Mobile App   │
-                               │  & Next.js Dashboard   │
-                               └───────────┬────────────┘
-                                           │
-         ┌─────────────────────────────────┼─────────────────────────────────┐
-         │ HTTP REST (JSON)                │ WebSockets (Socket.io)          │ HTTP REST (Inference)
-         ▼                                 ▼                                 ▼
-┌──────────────────┐              ┌──────────────────┐              ┌──────────────────┐
-│   core-engine    │              │ real-time-engine │              │ analytics-engine │
-│ (Django + DRF)   │              │ (Node.js + Express)             │    (FastAPI)     │
-└────────┬─────────┘              └────────┬─────────┘              └────────┬─────────┘
-         │                                 │                                 │
-         │ Publishes Events                │ Subscribes to Events            │ Pulls Batch Logs
-         └───────────────────► ┌───────────┴┐ ◄──────────────────────────────┘
-                               │   Redis    │
-                               │   Broker   │
-                               └─────┬──────┘
-                                     │
-         ┌───────────────────────────┴───────────────────────────┐
-         ▼                                                       ▼
-┌──────────────────┐                                    ┌──────────────────┐
-│    PostgreSQL    │                                    │     MongoDB      │
-│ (Relational Data)│                                    │  (NoSQL Document)│
-└──────────────────┘                                    └──────────────────┘
-
+        ┌─────────────────────────┐        ┌──────────────────────────┐
+        │  Flutter mobile_app      │        │  Next.js web_admin        │
+        │  (tourists & guides)     │        │  (admin / moderator)      │
+        └───────────┬─────────────┘        └────────────┬─────────────┘
+                    └──────────────┬──────────────────────┘
+                          ┌────────▼─────────┐   nginx (API gateway)
+                          └────────┬─────────┘
+        ┌──────────────────────────┼──────────────────────────┐
+        ▼                          ▼                            ▼
+┌────────────────┐        ┌────────────────┐          ┌────────────────────┐
+│  core-engine   │        │ real-time-engine│         │  analytics-engine   │
+│ Django + DRF   │        │ Node + Socket.IO│         │  FastAPI + sklearn  │
+└──────┬─────────┘        └────────┬────────┘          └─────────┬──────────┘
+       │ publishes events          │ subscribes                  │ inference
+       └─────────────────►  ┌──────┴──────┐  ◄───────────────────┘
+                            │    Redis     │
+                            └──────┬───────┘
+            ┌──────────────────────┴───────────────────────┐
+            ▼                                               ▼
+    ┌────────────────┐                            ┌────────────────┐
+    │  PostgreSQL    │                            │    MongoDB     │
+    └────────────────┘                            └────────────────┘
 ```
 
-### 1. Core Relational Engine (`services/core-engine`)
+## 🧰 Tech stack
 
-* **Technology Stack:** Django, Django REST Framework (DRF), `uv` environment runner.
-* **Storage Layer:** PostgreSQL / MySQL (ACID compliant).
-* **Responsibility:** Serves as the authoritative relational engine. Manages user identities via role-based access control (RBAC), custom JWT creation, automated business rule processing for trekking permits, financial ledger lines, and the centralized admin panel.
+| Layer | Service | Technology |
+| --- | --- | --- |
+| Business API | `services/core-engine` | Django 6 + DRF + Celery + SimpleJWT |
+| ML inference | `services/analytics-engine` | FastAPI + scikit-learn (+ optional PyTorch/MLflow) |
+| Realtime | `services/real-time-engine` | Node.js + TypeScript + Socket.IO |
+| Mobile | `apps/mobile_app` | Flutter + Riverpod (clean architecture) |
+| Admin | `apps/web_admin` | Next.js + TypeScript + Tailwind |
+| Data | — | PostgreSQL · MongoDB · Redis |
+| Infra | `infra/` | Docker Compose · nginx · MLflow · GitHub Actions · uv |
 
-### 2. Low-Latency Real-Time Engine (`services/real-time-engine`)
-
-* **Technology Stack:** Node.js, Express.js, Socket.io.
-* **Storage Layer:** Redis (In-Memory pub/sub and ephemeral caching).
-* **Responsibility:** Handles persistent long-lived network connections. It processes high-frequency spatial streams from hikers' GPS coordinates, coordinates live-chat protocols, and dispatches instantaneous crisis alerts without blocking downstream worker cycles.
-
-### 3. Intelligence & Analytics Engine (`services/analytics-engine`)
-
-* **Technology Stack:** FastAPI, `uv`, Scikit-learn / PyTorch / Pandas.
-* **Storage Layer:** MongoDB (NoSQL) for highly polymorphic un-normalized data.
-* **Responsibility:** Executes compute-heavy calculations. It runs background pipelines for travel destination recommendations, custom itinerary synthesis, pathing analysis, and tourist demand-forecasting models.
-
----
-
-## 🗄️ Database Polyglotism Strategy
-
-GuideU intentionally rejects the "one-size-fits-all" database pattern, applying specialized engines based directly on data form and usage attributes:
-
-* **PostgreSQL / MySQL (Relational SQL):** Used for Core Entities (`Users`, `Profiles`, `Permits`, `Payments`). Structural strictness guarantees absolute data protection, prevents race conditions on escrow transactions, and ensures reliable relational mapping via Foreign Key constraints.
-* **MongoDB (Document NoSQL):** Used for unstructured data profiles (`Flexible Multi-day Itineraries`, `User Activity/Click Logs`, `Dynamic Review Questionnaires`). Its schemaless nature accommodates diverse API inputs from tour configurations without requiring constant database migration downtime.
-* **Redis (In-Memory Key-Value):** Used as a distributed volatile layer. It performs three vital functions: serving as the cross-service Pub/Sub message broker, caching active user JWT blocklists, and housing ephemeral coordinates during active tracking sessions.
-
----
-
-## 📂 Repository Directory Structure
+## 📂 Repository layout
 
 ```text
 guideu/
-├── .gitignore
-├── README.md
-└── services/
-    ├── core-engine/                      # Django Relational Microservice
-    │   ├── pyproject.toml                # Managed Dependencies (DRF, SimpleJWT, psycopg2)
-    │   ├── uv.lock                       # Python Cryptographic Lockfile
-    │   ├── manage.py                     # Execution Entrypoint Wrapper
-    │   ├── config/                       # Infrastructure & Routing Matrix
-    │   └── src/                          # Isolated Domain Applications
-    │       ├── authentication/           # RBAC Custom Identity Logic
-    │       ├── bookings/                 # Guide matching state machines
-    │       └── payments/                 # Financial processing hooks (eSewa / Khalti)
-    │
-    ├── real-time-engine/                 # Node.js Asynchronous Telemetry Server
-    │   ├── package.json                  # Node Package Manifest (Socket.io, redis, dotenv)
-    │   ├── package-lock.json
-    │   └── src/
-    │       └── server.js                 # Event-Loop, WebSocket Handlers & Redis Subscriber
-    │
-    └── analytics-engine/                 # FastAPI Intelligence Engine
-        ├── pyproject.toml                # Managed ML Dependencies (FastAPI, Motor, Scikit-learn)
-        ├── uv.lock
-        └── main.py                       # ML Inference Routes & Itinerary Processors
-
+├── apps/
+│   ├── mobile_app/     # Flutter (clean architecture + Riverpod)
+│   └── web_admin/      # Next.js admin (App Router, layered)
+├── services/
+│   ├── core-engine/    # Django + DRF (config/ + src/<apps>)
+│   ├── analytics-engine/ # FastAPI ML service
+│   └── real-time-engine/ # Node + Socket.IO
+├── shared/             # cross-service TS types & constants
+├── infra/              # nginx gateway config
+├── data/               # dataset workspace (git-ignored contents)
+├── scripts/            # setup / lint / test helpers
+├── docs/               # architecture, ADRs, data, ml, ethics, sprints
+├── docker-compose.yml  # full local stack (+ override + mlflow + nginx)
+└── Makefile            # developer task runner (make help)
 ```
 
----
-
-## 🛠️ Installation & Environment Setup
-
-### Prerequisites
-
-* Python 3.12+ (Managed via `uv`)
-* Node.js v20+ & npm
-* PostgreSQL, MongoDB, and Redis instances running locally or via Docker
-
-### 1. Setup Core Relational Engine (Django)
+## ⚡ Quick start
 
 ```bash
-cd services/core-engine
-uv sync
-
+cp .env.example .env
+./scripts/setup.sh            # uv sync + npm install + flutter pub get
+docker compose up --build     # postgres, mongo, redis, services, mlflow, nginx
 ```
 
-Create a `.env` file within `services/core-engine/config/`:
+Or run services individually with the Makefile (`make help`).
 
-```env
-DEBUG=True
-SECRET_KEY=your-secure-django-key
-DATABASE_NAME=guideu_relational
-DATABASE_USER=postgres
-DATABASE_PASSWORD=your_secure_password
-DATABASE_HOST=127.0.0.1
-DATABASE_PORT=5432
-REDIS_URL=redis://127.0.0.1:6379/0
+## 🌐 Service URLs (local)
 
-```
+| Service | URL |
+| --- | --- |
+| core-engine (Django) | http://localhost:8000 · admin `/admin/` · docs `/api/docs/` |
+| analytics-engine (FastAPI) | http://localhost:8001/docs |
+| real-time-engine (Socket.IO) | ws://localhost:8002 |
+| web_admin (Next.js) | http://localhost:3000 |
+| MLflow UI | http://localhost:5000 |
+| nginx gateway | http://localhost:80 |
 
-Run database migrations and configure the administrative dashboard:
+## 🗓️ Sprint roadmap
 
-```bash
-uv run python manage.py migrate
-uv run python manage.py createsuperuser
+| Sprint | Scope | Status |
+| --- | --- | --- |
+| **1** | Repository foundation: monorepo, service skeletons, infra, CI, docs | ✅ done |
+| 2 | Domain features: catalog, bookings, payments, reviews, notifications; ML pipeline; realtime handlers; frontends | ▶ next |
+| 3 | Hardening: permissions audit, Celery jobs, contract/load tests | ☐ |
+| 4 | Production readiness: observability, payment live-mode, fairness gate | ☐ |
+| 5 | Polish, demo, documentation, optional IoT | ☐ |
 
-```
+Detailed plans live in [`docs/sprints/`](docs/sprints/). The full architecture,
+ADRs, dataset mapping, ML and ethics rationale are in [`docs/`](docs/).
 
-### 2. Setup Real-Time Engine (Node.js)
+## 🌿 Branching & commits
 
-```bash
-cd services/real-time-engine
-npm install
+Long-lived branches only: `main`, `sprint-1` … `sprint-5` (no feature branches).
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/)
+(`type(scope): subject`).
 
-```
+## 📜 License
 
-Create a `.env` file inside `services/real-time-engine/`:
-
-```env
-PORT=8080
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-
-```
-
-### 3. Setup Analytics Engine (FastAPI)
-
-```bash
-cd services/analytics-engine
-uv sync
-
-```
-
-Create a `.env` file inside `services/analytics-engine/`:
-
-```env
-MONGO_URI=mongodb://127.0.0.1:27017/guideu_nosql
-PORT=5000
-
-```
-
----
-
-## 🏃 Execution Manual
-
-Launch your local microservices cluster by opening three parallel terminal screens and executing these framework commands:
-
-### Start Core Business Logic Backend (Django)
-
-From `services/core-engine/`:
-
-```bash
-uv run python manage.py runserver 127.0.0.1:8000
-
-```
-
-* HTTP Endpoints: `http://127.0.0.1:8000/api/v1/` | Admin Panel: `http://127.0.0.1:8000/admin/`
-
-### Start Telemetry & WebSocket Broker (Node.js)
-
-From `services/real-time-engine/`:
-
-```bash
-npm run dev
-
-```
-
-* Open Socket connections bind directly to port `8080` (`ws://127.0.0.1:8080`)
-
-### Start Machine Learning Pipeline (FastAPI)
-
-From `services/analytics-engine/`:
-
-```bash
-uv run uvicorn main:app --reload --port 5000
-
-```
-
-* ML Inference Engine Documentation: `http://127.0.0.1:5000/docs`
-
----
-
-## 📊 Technical Justification for Academic Evaluation
-
-This multi-language, multi-database blueprint provides robust engineering proof items essential for high-scoring defenses:
-
-1. **True Polyglot Orchestration:** Demonstrates cross-boundary communication. When a transaction changes state in the Python environment (Django), a database signal serializes an event packet over an event-broker (Redis). A non-blocking JavaScript engine (Node.js) consumes it to alter client views over WebSockets instantaneously.
-2. **Asynchronous Runtime Separation:** Real-time location polling generates high I/O demands. Offloading this workload from Django onto Node.js keeps your core database connections free from thread-exhaustion bottlenecks, providing absolute fault isolation.
-3. **Optimized Storage Engines:** Rather than overloading a relational database with messy un-normalized tables, this architecture isolates dynamic, deep schemas (like travel routes and ML recommendation matrices) inside MongoDB, maximizing query processing speed and keeping your data model highly maintainable.
-
+MIT — see [LICENSE](LICENSE).
