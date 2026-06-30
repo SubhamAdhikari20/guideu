@@ -69,6 +69,7 @@ LOCAL_APPS = [
     "src.chat",
     "src.workspace",
     "src.currency",
+    "src.safety",
     "src.trust",
     "src.gamification",
     "src.audit",

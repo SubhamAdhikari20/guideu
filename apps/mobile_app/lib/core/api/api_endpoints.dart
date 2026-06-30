@@ -70,4 +70,7 @@ class ApiEndpoints {
   // Currency (core-engine)
   static const String currencyRates = '/currency/rates/';
   static const String currencyConvert = '/currency/convert/';
+
+  // Safety SOS (core-engine)
+  static const String sosAlerts = '/safety/sos/';
 }
