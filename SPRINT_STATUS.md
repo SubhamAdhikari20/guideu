@@ -1,4 +1,4 @@
-# GuideU — Sprint Status (through Sprint 4)
+# GuideU — Sprint Status (through Sprint 5 — complete)
 
 GuideU is an AI-powered tourism platform for Nepal (BSc thesis + startup).
 GitHub: `SubhamAdhikari20/guideu`.
@@ -19,9 +19,9 @@ layer returns `(Failure?, T?)` records (no Either). Riverpod for DI; list state
 exposed as `AsyncValue`. Dio client attaches JWT and does a one-shot refresh on 401.
 
 ## Branches
-`main` + `sprint-1`..`sprint-5`. Sprints 1, 2, and 3 are merged into `main`.
-Sprint 4 work lives on `sprint-4` (not yet merged at time of writing).
-Local safety branch `backup/pre-sprint1-2026-06-29` is preserved.
+`main` + `sprint-1`..`sprint-5`. Sprints 1–4 are merged into `main`. Sprint 5
+work lives on `sprint-5` (ready to merge). Local safety branch
+`backup/pre-sprint1-2026-06-29` is preserved.
 
 ## Sprint 1 — DONE (merged)
 Repository foundation: monorepo layout, service skeletons, infra
@@ -51,8 +51,23 @@ gaps and built the app frontends.
   Reports) with server-side fetches so secrets stay server-side.
 - See `docs/sprints/sprint_4/` for the plan and review.
 
+## Sprint 5 — DONE (on `sprint-5`)
+Final sprint: features, polish, hardening, testing, deployment, docs.
+- **Backend:** `workspace` (trips + items, reorder, budget, AI suggestions),
+  `currency` (rates + convert, Celery refresh), `safety` (SOS alerts).
+- **Mobile:** travel workspace screens (drag-and-drop itinerary + budget bar),
+  currency converter + reusable price display, Emergency SOS, shared
+  empty/error state widgets.
+- **Hardening:** login/register rate limits, input sanitisation, Nginx security
+  headers (`docs/architecture/SECURITY.md`); caching + query optimisation
+  (`docs/performance/PERFORMANCE.md`).
+- **Testing:** end-to-end journey test + per-app tests (21 backend tests pass).
+- **Deploy/docs:** `docker-compose.prod.yml` + `scripts/deploy.sh` +
+  `docs/DEPLOYMENT.md`; `docs/THESIS_SUBMISSION_CHECKLIST.md`, `docs/DEMO_SCRIPT.md`.
+- See `docs/sprints/sprint_5/` for the plan and review.
+
 ## Verification
-`manage.py check` clean; `pytest` 7 passing; `flutter analyze`/`test` clean;
+`manage.py check` clean; `pytest` **21 passing**; `flutter analyze`/`test` clean;
 real-time-engine `tsc` build clean; web_admin `lint` + `build` clean.
 
 ## Key API endpoints (core-engine, `/api/v1`)
@@ -65,9 +80,13 @@ real-time-engine `tsc` build clean; web_admin `lint` + `build` clean.
 - `recommendations/{routes,guides}/`
 - `chat/{threads,messages}/`
 - `trust/price-check/` + `trust/scam-reports/`
+- `workspace/{trips,items}/` (+ `trips/{id}/{ai-suggestions,apply-suggestions,budget-summary}/`)
+- `currency/{rates,convert}/`
+- `safety/sos/` (+ `sos/{id}/resolve/`)
 
 Pagination: page-number `{count, next, previous, results}`, page_size 25.
 
-## Next
-Sprint 5 — offline maps / IoT SOS direction, plus carried-over admin auth +
-moderation write actions and guide-verification / user-management pages.
+## Next (post-thesis / future work)
+Offline map tile pre-download (needs route lat/lng), on-device chat translation,
+real hotel/flight/bus inventory APIs, physical IoT SOS device, admin moderation
+write actions + guide-verification / user-management pages.

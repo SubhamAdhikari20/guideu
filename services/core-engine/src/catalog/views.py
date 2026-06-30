@@ -3,6 +3,7 @@ from __future__ import annotations
 import calendar
 from datetime import date
 
+from django.core.cache import cache
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -95,6 +96,13 @@ class CulturalEventViewSet(viewsets.ModelViewSet):
         months_ahead = max(1, min(months_ahead, 12))
 
         start = date.today().month
+        # The calendar only changes when events are edited; cache it briefly so
+        # this scan-and-group doesn't run on every open.
+        cache_key = f"events:upcoming:{start}:{months_ahead}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
         wanted = [((start - 1 + i) % 12) + 1 for i in range(months_ahead)]
 
         buckets: dict[int, dict[str, dict]] = {m: {} for m in wanted}
@@ -126,7 +134,9 @@ class CulturalEventViewSet(viewsets.ModelViewSet):
             }
             for m in wanted
         ]
-        return Response({"from_month": start, "months": months})
+        payload = {"from_month": start, "months": months}
+        cache.set(cache_key, payload, 60 * 30)  # 30 minutes
+        return Response(payload)
 
 
 class PricingBenchmarkViewSet(viewsets.ModelViewSet):

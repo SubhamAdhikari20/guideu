@@ -67,6 +67,9 @@ LOCAL_APPS = [
     "src.analytics",
     "src.recommendations",
     "src.chat",
+    "src.workspace",
+    "src.currency",
+    "src.safety",
     "src.trust",
     "src.gamification",
     "src.audit",
@@ -172,6 +175,8 @@ REST_FRAMEWORK = {
         "anon": os.environ.get("THROTTLE_ANON", "60/min"),
         "user": os.environ.get("THROTTLE_USER", "1000/hour"),
         "scam_check": os.environ.get("THROTTLE_SCAM", "30/min"),
+        "login": os.environ.get("THROTTLE_LOGIN", "10/min"),
+        "register": os.environ.get("THROTTLE_REGISTER", "5/min"),
     },
 }
 
@@ -216,6 +221,10 @@ CELERY_BEAT_SCHEDULE = {
     "expire-stale-pending-bookings": {
         "task": "src.bookings.tasks.expire_stale_pending_bookings",
         "schedule": 60 * 60,  # hourly
+    },
+    "refresh-currency-rates": {
+        "task": "src.currency.tasks.refresh_currency_rates",
+        "schedule": 60 * 60 * 6,  # every 6 hours
     },
 }
 
