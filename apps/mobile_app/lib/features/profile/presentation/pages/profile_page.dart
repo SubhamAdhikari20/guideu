@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/providers/auth_state.dart';
+import '../../../bookings/presentation/pages/my_bookings_page.dart';
 
 /// Profile tab — shows the signed-in user and lets them log out.
 class ProfilePage extends ConsumerWidget {
@@ -56,7 +57,13 @@ class ProfilePage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const _Tile(icon: Icons.bookmark_border, label: 'My Bookings'),
+          _Tile(
+            icon: Icons.receipt_long_outlined,
+            label: 'My Bookings',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const MyBookingsPage()),
+            ),
+          ),
           const _Tile(icon: Icons.settings_outlined, label: 'Settings'),
           const _Tile(icon: Icons.lock_outline, label: 'Security'),
           const SizedBox(height: 24),
@@ -103,10 +110,11 @@ class _RoleBadge extends StatelessWidget {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile({required this.icon, required this.label});
+  const _Tile({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +123,10 @@ class _Tile extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(label),
       trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$label is coming soon.')),
-      ),
+      onTap: onTap ??
+          () => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('$label is coming soon.')),
+              ),
     );
   }
 }
