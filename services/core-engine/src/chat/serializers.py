@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
+from src.common.sanitize import clean_text
+
 from .models import ChatMessage, ChatThread
 
 
@@ -20,6 +22,12 @@ class SendMessageSerializer(serializers.Serializer):
 
     room = serializers.CharField(max_length=64)
     body = serializers.CharField(max_length=4000, trim_whitespace=True)
+
+    def validate_body(self, value: str) -> str:
+        cleaned = clean_text(value)
+        if not cleaned:
+            raise serializers.ValidationError("Message cannot be empty.")
+        return cleaned
 
 
 class ChatThreadSerializer(serializers.ModelSerializer):

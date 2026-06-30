@@ -175,6 +175,8 @@ REST_FRAMEWORK = {
         "anon": os.environ.get("THROTTLE_ANON", "60/min"),
         "user": os.environ.get("THROTTLE_USER", "1000/hour"),
         "scam_check": os.environ.get("THROTTLE_SCAM", "30/min"),
+        "login": os.environ.get("THROTTLE_LOGIN", "10/min"),
+        "register": os.environ.get("THROTTLE_REGISTER", "5/min"),
     },
 }
 
