@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
+from src.common.sanitize import clean_text
+
 from .models import TravelWorkspace, WorkspaceItem
 
 
@@ -22,6 +24,12 @@ class WorkspaceItemSerializer(serializers.ModelSerializer):
         if request and workspace.tourist_id != request.user.id:
             raise serializers.ValidationError("Not your workspace.")
         return workspace
+
+    def validate_custom_title(self, value: str) -> str:
+        return clean_text(value)
+
+    def validate_custom_description(self, value: str) -> str:
+        return clean_text(value)
 
 
 class TravelWorkspaceSerializer(serializers.ModelSerializer):
