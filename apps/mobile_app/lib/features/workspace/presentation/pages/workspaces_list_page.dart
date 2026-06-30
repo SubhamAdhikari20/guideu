@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_retry.dart';
 import '../../domain/entities/trip.dart';
 import '../providers/workspace_providers.dart';
 import 'workspace_detail_page.dart';
@@ -24,31 +26,18 @@ class WorkspacesListPage extends ConsumerWidget {
       ),
       body: trips.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Could not load your trips.',
-                  style: TextStyle(color: AppColors.textSecondary)),
-              const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed: () => ref.invalidate(tripsProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
+        error: (_, _) => ErrorRetry(
+          message: 'Could not load your trips.',
+          onRetry: () => ref.invalidate(tripsProvider),
         ),
         data: (items) {
           if (items.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'No trips yet.\nTap "New trip" to start planning your journey.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
+            return EmptyState(
+              icon: Icons.map_outlined,
+              title: 'No trips yet',
+              message: 'Start planning your journey across Nepal.',
+              actionLabel: 'New trip',
+              onAction: () => _createTrip(context, ref),
             );
           }
           return RefreshIndicator(
