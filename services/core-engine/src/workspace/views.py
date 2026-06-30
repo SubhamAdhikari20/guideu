@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from . import services
 from .models import TravelWorkspace, WorkspaceItem
 from .serializers import (
     ReorderItemSerializer,
@@ -37,6 +38,23 @@ class TravelWorkspaceViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(tourist=self.request.user)
+
+    @action(detail=True, methods=["get"], url_path="ai-suggestions")
+    def ai_suggestions(self, request, *args, **kwargs):
+        """Preview an AI-built itinerary for this trip (does not save)."""
+        workspace = self.get_object()
+        season = request.query_params.get("season") or None
+        suggestions = services.suggest_itinerary(workspace, season=season)
+        return Response({"trip_days": workspace.trip_days, "suggestions": suggestions})
+
+    @action(detail=True, methods=["post"], url_path="apply-suggestions")
+    def apply_suggestions(self, request, *args, **kwargs):
+        """Accept the AI itinerary — saves the suggested items onto the trip."""
+        workspace = self.get_object()
+        season = request.data.get("season") or None
+        services.apply_itinerary(workspace, season=season)
+        workspace = self.get_queryset().get(pk=workspace.pk)
+        return Response(TravelWorkspaceDetailSerializer(workspace).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"], url_path="budget-summary")
     def budget_summary(self, request, *args, **kwargs):

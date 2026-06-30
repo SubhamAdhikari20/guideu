@@ -4,6 +4,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from src.authentication.models import User
+from src.catalog.models import Region, TrekkingRoute
 from src.workspace.models import TravelWorkspace, WorkspaceItem
 
 
@@ -74,6 +75,25 @@ def test_reorder_updates_day_and_order(tourist):
     assert r.status_code == 200
     b.refresh_from_db()
     assert b.day_number == 2
+
+
+@pytest.mark.django_db
+def test_apply_ai_suggestions_seeds_items_from_routes(tourist):
+    region = Region.objects.create(name="Khumbu", slug="khumbu")
+    for i in range(3):
+        TrekkingRoute.objects.create(
+            external_id=f"RTE000{i}", route_name=f"Route {i}", region=region,
+            difficulty="Hard", badge_points=100 - i, estimated_cost_usd=400,
+        )
+    client = auth(tourist)
+    trip = TravelWorkspace.objects.create(
+        tourist=tourist, title="AI Trip", start_date="2026-10-01", end_date="2026-10-03"
+    )
+    # ML service is unreachable in tests, so this exercises the fallback path.
+    r = client.post(f"/api/v1/workspace/trips/{trip.id}/apply-suggestions/")
+    assert r.status_code == 201
+    assert len(r.json()["items"]) >= 1
+    assert WorkspaceItem.objects.filter(workspace=trip, item_type="destination").exists()
 
 
 @pytest.mark.django_db
