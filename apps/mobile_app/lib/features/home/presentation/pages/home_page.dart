@@ -13,6 +13,7 @@ import '../../../guides/domain/entities/guide.dart';
 import '../../../guides/presentation/providers/guide_providers.dart';
 import '../../../guides/presentation/widgets/guide_profile_sheet.dart';
 import '../../../recommendations/presentation/providers/recommendation_providers.dart';
+import '../../../workspace/presentation/pages/workspaces_list_page.dart';
 
 /// Home tab — discovery landing styled after the Home prototype: greeting,
 /// search, a hero banner, quick actions and a "Nearby Guides" strip.
@@ -57,6 +58,12 @@ class HomePage extends ConsumerWidget {
             _PackagesCta(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PackagesPage()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _PlanTripCta(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WorkspacesListPage()),
               ),
             ),
             const SizedBox(height: 12),
@@ -351,6 +358,48 @@ class _PackagesCta extends StatelessWidget {
               ),
             ),
             const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlanTripCta extends StatelessWidget {
+  const _PlanTripCta({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.gold.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.map_outlined, color: AppColors.gold),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Plan your trip',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  SizedBox(height: 2),
+                  Text(
+                    'Build a day-by-day itinerary with a budget tracker',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
