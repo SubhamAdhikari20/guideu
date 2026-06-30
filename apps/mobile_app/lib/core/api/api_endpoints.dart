@@ -60,4 +60,10 @@ class ApiEndpoints {
   static const String workspaceTrips = '/workspace/trips/';
   static const String workspaceItems = '/workspace/items/';
   static const String workspaceItemsReorder = '/workspace/items/reorder/';
+  static String workspaceAiSuggestions(int tripId) =>
+      '/workspace/trips/$tripId/ai-suggestions/';
+  static String workspaceApplySuggestions(int tripId) =>
+      '/workspace/trips/$tripId/apply-suggestions/';
+  static String workspaceBudgetSummary(int tripId) =>
+      '/workspace/trips/$tripId/budget-summary/';
 }
