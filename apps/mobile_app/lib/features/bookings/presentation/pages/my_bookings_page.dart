@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/error/failures.dart';
+import '../../../payments/presentation/widgets/payment_sheet.dart';
 import '../../domain/entities/booking.dart';
 import '../providers/booking_providers.dart';
 import '../widgets/booking_card.dart';
@@ -45,6 +46,7 @@ class MyBookingsPage extends ConsumerWidget {
                 for (final b in items)
                   BookingCard(
                     booking: b,
+                    onPay: b.isPending ? () => _pay(context, ref, b) : null,
                     onCancel: b.canCancel
                         ? () => _confirmCancel(context, ref, b)
                         : null,
@@ -55,6 +57,21 @@ class MyBookingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _pay(BuildContext context, WidgetRef ref, Booking booking) async {
+    final paid = await showPaymentSheet(
+      context,
+      bookingId: booking.id,
+      amount: booking.totalPrice,
+      title: booking.tourPackageTitle,
+    );
+    if (paid == true && context.mounted) {
+      ref.invalidate(myBookingsProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payment successful. Booking confirmed!')),
+      );
+    }
   }
 
   Future<void> _confirmCancel(
