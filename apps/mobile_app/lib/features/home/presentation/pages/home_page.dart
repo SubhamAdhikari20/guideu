@@ -6,6 +6,7 @@ import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/providers/auth_state.dart';
 import '../../../anti_scam/presentation/pages/price_check_page.dart';
 import '../../../bookings/presentation/pages/packages_page.dart';
+import '../../../chat/presentation/pages/chat_threads_page.dart';
 import '../../../destinations/domain/entities/destination.dart';
 import '../../../destinations/presentation/widgets/destination_detail_sheet.dart';
 import '../../../guides/domain/entities/guide.dart';
@@ -150,6 +151,13 @@ class _Header extends StatelessWidget {
           ],
         ),
         const Spacer(),
+        IconButton(
+          icon: const Icon(Icons.chat_bubble_outline),
+          tooltip: 'Messages',
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ChatThreadsPage()),
+          ),
+        ),
         IconButton(
           icon: const Icon(Icons.notifications_none),
           onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
