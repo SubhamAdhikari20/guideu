@@ -25,6 +25,7 @@ api_patterns = [
     path("analytics/", include("src.analytics.urls")),
     path("recommendations/", include("src.recommendations.urls")),
     path("chat/", include("src.chat.urls")),
+    path("workspace/", include("src.workspace.urls")),
     path("trust/", include("src.trust.urls")),
     path("gamification/", include("src.gamification.urls")),
 ]
