@@ -11,7 +11,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health
+from app.api import guides, health, pricing, recommendations, scam
 from app.config import get_settings
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
@@ -19,10 +19,13 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message
 DESCRIPTION = """
 GuideU's machine-learning service.
 
-Sprint 1 ships the service foundation: a health/liveness probe and the model
-registry. Inference endpoints (anti-scam, recommendations, guide ranking,
-pricing) are delivered from sprint-2 onward. Internal endpoints require the
-`X-API-Key` header.
+* **/api/v1/scam/score** — explainable overcharge / scam probability
+* **/api/v1/recommendations/routes** — personalised, traceable route ranking
+* **/api/v1/guides/rank** — verified-guide ranking
+* **/api/v1/pricing/benchmark** — fair-price transparency
+* **/api/v1/models** — model registry (versions, metrics, fairness)
+
+Internal endpoints require the `X-API-Key` header.
 """.strip()
 
 
@@ -42,6 +45,10 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(health.router)
+    app.include_router(scam.router)
+    app.include_router(recommendations.router)
+    app.include_router(guides.router)
+    app.include_router(pricing.router)
 
     @app.get("/", tags=["health"])
     async def index() -> dict:
