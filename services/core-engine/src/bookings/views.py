@@ -23,6 +23,19 @@ class BookingSessionViewSet(viewsets.ModelViewSet):
     search_fields = ('booking_reference', 'tourist__username', 'assigned_guide__username')
     ordering_fields = ('start_date', 'end_date', 'status')
 
+    def get_queryset(self):
+        """Tourists see their own bookings (or the ones assigned to them as a
+        guide); staff see everything."""
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.is_staff:
+            return qs
+        from django.db.models import Q
+        return qs.filter(Q(tourist=user) | Q(assigned_guide=user))
+
+    def perform_create(self, serializer):
+        serializer.save(tourist=self.request.user)
+
 
 class ItineraryItemViewSet(viewsets.ModelViewSet):
     queryset = ItineraryItem.objects.all()
