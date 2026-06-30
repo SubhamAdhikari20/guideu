@@ -29,6 +29,9 @@ class ApiEndpoints {
   static const String routes = '/catalog/routes/';
   static const String regions = '/catalog/regions/';
   static const String guidesRegistry = '/catalog/guides-registry/';
+  static const String events = '/catalog/events/';
+  static const String eventsUpcoming = '/catalog/events/upcoming/';
+  static const String pricingLookup = '/catalog/pricing-benchmarks/lookup/';
 
   // Bookings (core-engine)
   static const String packages = '/bookings/packages/';
@@ -48,4 +51,8 @@ class ApiEndpoints {
   // Chat history (core-engine; live delivery via real-time-engine socket)
   static const String chatThreads = '/chat/threads/';
   static const String chatMessages = '/chat/messages/';
+
+  // Trust / anti-scam (core-engine)
+  static const String priceCheck = '/trust/price-check/';
+  static const String scamReports = '/trust/scam-reports/';
 }
