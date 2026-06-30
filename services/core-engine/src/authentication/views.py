@@ -4,9 +4,10 @@ from rest_framework import permissions, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
-from .serializers import UserSerializer
+from .serializers import EmailTokenObtainPairSerializer, UserSerializer
 
 
 class RegistrationAPIView(APIView):
@@ -34,3 +35,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    """Issues JWT access/refresh tokens from an email + password."""
+
+    serializer_class = EmailTokenObtainPairSerializer
