@@ -10,6 +10,12 @@ class ApiEndpoints {
     defaultValue: 'http://10.0.2.2:8000/api/v1',
   );
 
+  /// Socket.IO base for the real-time-engine (live chat, presence).
+  static const String realtimeBaseUrl = String.fromEnvironment(
+    'GUIDEU_REALTIME_URL',
+    defaultValue: 'http://10.0.2.2:8002',
+  );
+
   static const Duration connectTimeout = Duration(seconds: 20);
   static const Duration receiveTimeout = Duration(seconds: 20);
 
@@ -38,4 +44,8 @@ class ApiEndpoints {
   // Recommendations (core-engine -> analytics-engine)
   static const String recommendRoutes = '/recommendations/routes/';
   static const String recommendGuides = '/recommendations/guides/';
+
+  // Chat history (core-engine; live delivery via real-time-engine socket)
+  static const String chatThreads = '/chat/threads/';
+  static const String chatMessages = '/chat/messages/';
 }
