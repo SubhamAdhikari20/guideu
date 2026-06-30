@@ -55,4 +55,22 @@ class ApiEndpoints {
   // Trust / anti-scam (core-engine)
   static const String priceCheck = '/trust/price-check/';
   static const String scamReports = '/trust/scam-reports/';
+
+  // Travel workspace (core-engine)
+  static const String workspaceTrips = '/workspace/trips/';
+  static const String workspaceItems = '/workspace/items/';
+  static const String workspaceItemsReorder = '/workspace/items/reorder/';
+  static String workspaceAiSuggestions(int tripId) =>
+      '/workspace/trips/$tripId/ai-suggestions/';
+  static String workspaceApplySuggestions(int tripId) =>
+      '/workspace/trips/$tripId/apply-suggestions/';
+  static String workspaceBudgetSummary(int tripId) =>
+      '/workspace/trips/$tripId/budget-summary/';
+
+  // Currency (core-engine)
+  static const String currencyRates = '/currency/rates/';
+  static const String currencyConvert = '/currency/convert/';
+
+  // Safety SOS (core-engine)
+  static const String sosAlerts = '/safety/sos/';
 }
