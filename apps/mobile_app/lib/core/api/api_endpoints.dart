@@ -34,4 +34,8 @@ class ApiEndpoints {
   // Reviews (core-engine)
   static const String reviews = '/reviews/reviews/';
   static const String reviewSummary = '/reviews/reviews/summary/';
+
+  // Recommendations (core-engine -> analytics-engine)
+  static const String recommendRoutes = '/recommendations/routes/';
+  static const String recommendGuides = '/recommendations/guides/';
 }

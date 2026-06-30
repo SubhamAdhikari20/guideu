@@ -65,6 +65,7 @@ LOCAL_APPS = [
     "src.favorites",
     "src.notifications",
     "src.analytics",
+    "src.recommendations",
     "src.trust",
     "src.gamification",
     "src.audit",
