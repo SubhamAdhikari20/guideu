@@ -23,4 +23,15 @@ class ApiEndpoints {
   static const String routes = '/catalog/routes/';
   static const String regions = '/catalog/regions/';
   static const String guidesRegistry = '/catalog/guides-registry/';
+
+  // Bookings (core-engine)
+  static const String packages = '/bookings/packages/';
+  static const String bookings = '/bookings/bookings/';
+
+  // Payments (core-engine)
+  static const String payments = '/payments/payments/';
+
+  // Reviews (core-engine)
+  static const String reviews = '/reviews/reviews/';
+  static const String reviewSummary = '/reviews/reviews/summary/';
 }

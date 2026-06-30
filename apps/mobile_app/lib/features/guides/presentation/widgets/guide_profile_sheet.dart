@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../reviews/presentation/widgets/reviews_section.dart';
+import '../../../reviews/presentation/widgets/write_review_sheet.dart';
 import '../../domain/entities/guide.dart';
 
 /// Opens the "Guide Profile" bottom sheet for a [Guide], matching the prototype:
@@ -143,20 +145,38 @@ class _GuideProfileSheet extends StatelessWidget {
                 children: [for (final r in g.regions) _Chip(r)],
               ),
             ],
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Guide booking arrives in the next update.'),
+            const SizedBox(height: 20),
+            GuideReviewsSection(guideId: g.id),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => showWriteReviewSheet(
+                      context,
+                      guideId: g.id,
+                      guideName: g.guideCode,
                     ),
-                  );
-                },
-                child: const Text('Book this guide'),
-              ),
+                    child: const Text('Write a review'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Browse Tour Packages to book a trip with a guide.',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Book this guide'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

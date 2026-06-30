@@ -8,6 +8,9 @@ from .models import PaymentTransaction, EscrowLedger
 
 
 class PaymentTransactionSerializer(serializers.ModelSerializer):
+    # The payer is taken from the logged-in user in the view.
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = PaymentTransaction
         fields = ('id', 'user', 'booking', 'amount', 'currency', 'status', 'gateway', 'gateway_reference', 'gateway_metadata', 'created_at')
