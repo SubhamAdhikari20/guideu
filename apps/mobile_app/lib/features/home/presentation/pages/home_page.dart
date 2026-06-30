@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/providers/auth_state.dart';
+import '../../../bookings/presentation/pages/packages_page.dart';
 import '../../../guides/domain/entities/guide.dart';
 import '../../../guides/presentation/providers/guide_providers.dart';
 import '../../../guides/presentation/widgets/guide_profile_sheet.dart';
@@ -36,6 +37,12 @@ class HomePage extends ConsumerWidget {
             const _HeroBanner(),
             const SizedBox(height: 20),
             _QuickActions(onGuides: onSeeGuides),
+            const SizedBox(height: 20),
+            _PackagesCta(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PackagesPage()),
+              ),
+            ),
             const SizedBox(height: 24),
             Row(
               children: [
@@ -272,6 +279,51 @@ class _ActionItem extends StatelessWidget {
           const SizedBox(height: 6),
           Text(label, style: const TextStyle(fontSize: 13)),
         ],
+      ),
+    );
+  }
+}
+
+class _PackagesCta extends StatelessWidget {
+  const _PackagesCta({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.gold.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.card_travel, color: AppColors.gold),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tour Packages',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Book curated treks and tours across Nepal',
+                    style:
+                        TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          ],
+        ),
       ),
     );
   }
