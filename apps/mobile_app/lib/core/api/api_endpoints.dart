@@ -66,4 +66,8 @@ class ApiEndpoints {
       '/workspace/trips/$tripId/apply-suggestions/';
   static String workspaceBudgetSummary(int tripId) =>
       '/workspace/trips/$tripId/budget-summary/';
+
+  // Currency (core-engine)
+  static const String currencyRates = '/currency/rates/';
+  static const String currencyConvert = '/currency/convert/';
 }

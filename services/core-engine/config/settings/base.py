@@ -68,6 +68,7 @@ LOCAL_APPS = [
     "src.recommendations",
     "src.chat",
     "src.workspace",
+    "src.currency",
     "src.trust",
     "src.gamification",
     "src.audit",
@@ -217,6 +218,10 @@ CELERY_BEAT_SCHEDULE = {
     "expire-stale-pending-bookings": {
         "task": "src.bookings.tasks.expire_stale_pending_bookings",
         "schedule": 60 * 60,  # hourly
+    },
+    "refresh-currency-rates": {
+        "task": "src.currency.tasks.refresh_currency_rates",
+        "schedule": 60 * 60 * 6,  # every 6 hours
     },
 }
 
