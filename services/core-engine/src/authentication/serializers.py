@@ -65,3 +65,29 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+
+class EmailTokenObtainPairSerializer(serializers.Serializer):
+    """Log in with email + password — the mobile login screen uses email, but
+    the default SimpleJWT serializer expects the username field."""
+
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        try:
+            user = User.objects.get(email__iexact=attrs['email'])
+        except User.DoesNotExist as exc:
+            raise serializers.ValidationError('Invalid email or password.') from exc
+
+        if not user.check_password(attrs['password']):
+            raise serializers.ValidationError('Invalid email or password.')
+        if not user.is_active:
+            raise serializers.ValidationError('This account is disabled.')
+
+        refresh = RefreshToken.for_user(user)
+        refresh['role'] = user.role
+        refresh['email'] = user.email
+        return {'refresh': str(refresh), 'access': str(refresh.access_token)}
