@@ -67,6 +67,7 @@ LOCAL_APPS = [
     "src.analytics",
     "src.recommendations",
     "src.chat",
+    "src.workspace",
     "src.trust",
     "src.gamification",
     "src.audit",

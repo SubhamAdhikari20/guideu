@@ -55,4 +55,9 @@ class ApiEndpoints {
   // Trust / anti-scam (core-engine)
   static const String priceCheck = '/trust/price-check/';
   static const String scamReports = '/trust/scam-reports/';
+
+  // Travel workspace (core-engine)
+  static const String workspaceTrips = '/workspace/trips/';
+  static const String workspaceItems = '/workspace/items/';
+  static const String workspaceItemsReorder = '/workspace/items/reorder/';
 }
