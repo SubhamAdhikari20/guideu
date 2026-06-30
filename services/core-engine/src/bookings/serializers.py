@@ -22,12 +22,15 @@ class ItineraryItemSerializer(serializers.ModelSerializer):
 
 class BookingSessionSerializer(serializers.ModelSerializer):
     itinerary_items = ItineraryItemSerializer(many=True, read_only=True)
-    tourist = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    # The tourist is taken from the logged-in user in the view, so clients never
+    # send (or spoof) it.
+    tourist = serializers.PrimaryKeyRelatedField(read_only=True)
+    tour_package_title = serializers.CharField(source='tour_package.title', read_only=True)
     assigned_guide = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=User.Roles.GUIDE), required=False, allow_null=True)
 
     class Meta:
         model = BookingSession
-        fields = ('id', 'booking_reference', 'tourist', 'tour_package', 'route', 'start_date', 'end_date', 'status', 'assigned_guide', 'total_price', 'notes', 'itinerary_items')
+        fields = ('id', 'booking_reference', 'tourist', 'tour_package', 'tour_package_title', 'route', 'start_date', 'end_date', 'status', 'assigned_guide', 'total_price', 'notes', 'itinerary_items')
         read_only_fields = ('booking_reference', 'total_price')
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
