@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/providers/auth_state.dart';
+import '../../../anti_scam/presentation/pages/price_check_page.dart';
 import '../../../bookings/presentation/pages/packages_page.dart';
 import '../../../destinations/domain/entities/destination.dart';
 import '../../../destinations/presentation/widgets/destination_detail_sheet.dart';
@@ -55,6 +56,12 @@ class HomePage extends ConsumerWidget {
             _PackagesCta(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PackagesPage()),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _SafetyCta(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PriceCheckPage()),
               ),
             ),
             const SizedBox(height: 24),
@@ -336,6 +343,52 @@ class _PackagesCta extends StatelessWidget {
               ),
             ),
             const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SafetyCta extends StatelessWidget {
+  const _SafetyCta({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.shield_outlined, color: AppColors.primary),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Is this price fair?',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Check a quoted price and avoid getting overcharged',
+                    style:
+                        TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
