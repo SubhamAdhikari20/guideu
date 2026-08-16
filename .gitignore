@@ -85,3 +85,8 @@ desktop.ini
 
 # ---- Thesis figure build ---------------------------------------------------
 scripts/_figure_html/
+
+# ---- Project documentation & tooling (kept local, not published) -----------
+docs/
+scripts/
+SPRINT_STATUS.md
